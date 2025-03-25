@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>To-Do List</title>
+</head>
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+  <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
+    <h1 class="text-2xl font-bold text-center text-blue-600">To-Do List</h1>
+    
+    <div class="mt-4 flex">
+      <input id="taskInput" type="text" placeholder="Add a new task..." class="w-full p-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-400" />
+      <button onclick="addTask()" class="bg-blue-600 text-white px-4 py-2 rounded-r-md">Add</button>
+    </div>
+
+    <ul id="taskList" class="mt-6 space-y-2"></ul>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', loadTasks);
+
+    function addTask() {
+      const taskInput = document.getElementById('taskInput');
+      const taskList = document.getElementById('taskList');
+      const taskText = taskInput.value.trim();
+
+      if (taskText === '') return;
+
+      const li = document.createElement('li');
+      li.className = 'flex justify-between items-center bg-gray-200 p-3 rounded-md';
+      li.innerHTML = `<span>${taskText}</span>
+                      <button onclick="removeTask(this)" class="text-red-500 hover:text-red-700">Remove</button>`;
+      taskList.appendChild(li);
+
+      saveTask(taskText);
+      taskInput.value = '';
+    }
+
+    function removeTask(button) {
+      const taskList = document.getElementById('taskList');
+      const taskText = button.previousElementSibling.textContent;
+      button.parentElement.remove();
+      removeTaskFromStorage(taskText);
+    }
+
+    function saveTask(task) {
+      let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+      tasks.push(task);
+      localStorage.setItem('tasks', JSON.stringify(tasks));
+    }
+
+    function removeTaskFromStorage(task) {
+      let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+      tasks = tasks.filter(t => t !== task);
+      localStorage.setItem('tasks', JSON.stringify(tasks));
+    }
+
+    function loadTasks() {
+      const taskList = document.getElementById('taskList');
+      const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+      tasks.forEach(taskText => {
+        const li = document.createElement('li');
+        li.className = 'flex justify-between items-center bg-gray-200 p-3 rounded-md';
+        li.innerHTML = `<span>${taskText}</span>
+                        <button onclick="removeTask(this)" class="text-red-500 hover:text-red-700">Remove</button>`;
+        taskList.appendChild(li);
+      });
+    }
+  </script>
+</body>
+</html>
